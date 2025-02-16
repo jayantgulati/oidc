@@ -4,8 +4,7 @@ on:
   push:
     branches:
     - main
-env:
-  AWS_Region: "ap-south-1"    
+
 permissions:
   id-token: write
   contents: read
@@ -19,9 +18,15 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
-        role-to-assume: arn:aws:iam::851725202832:role/oidc
+        role-to-assume: ${{ secrets.ROLE_ARN }}
         role-session-name: samplerolesession
-        aws-region: ${{ env.AWS_Region }}
+        aws-region: ${{ secrets.AWS_Region }}
 
     - name: Deploy static site to S3 bucket
       run: aws s3 sync . s3://oidc-cc --delete
+    
+    - name: List Buckets
+      run: aws s3 ls
+    
+    - name: print assumed role
+      run:  aws sts get-caller-identity 
